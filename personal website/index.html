@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="styles.css" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+    <title>Kenny Le's Website</title>
+    <!-- 300 word write up:
+        
+    This webpage is meant to be an "About Me" page that gives a closer look at my personal interests, hobbies, and my hometown.
+    It shows my passion for basketball as a game, sport, and way of connecting with other people, namely friends and family.
+    I decided to apply an orange-to-white gradient for my background because it matched the yellow/orange color of some of my photos nicely.
+    I wanted the main title/header of the page to stand out, so I made it noticeably bigger than the subheaders and bolded and black while making the 
+    rest of the subheaders grey and underlined. Under the header, I centered a good picture of myself so the viewer could recognize me and see what I look like. 
+    Directly under that, I give a quick greeting and introduction to who I am in case someone who does know me ends up on this page. 
+    Since I knew I wanted to write mainly about my passion for basketball, I aligned the picture of myself playing basketball to the left so I could 
+    have the section of text take up most of my page to give it more focus. I also put rounded boxes around the text boxes to give a more modern look 
+    and get rid of the raw look to the website. For the final section, I wanted to show the viewer pictures that represent my diverse background, 
+    so I showed a gallery of side-by-side pictures of my friends and I hanging out in Sacramento. For this section, I reverse the order by putting the text box
+     on the left and the gallery of photos on the right. I approached the responsive design by using CSS media queries and changing the flex-flow of containers 
+     from rows to columns so the pictures and text boxes fit better on a mobile screen. I incorporated alt texts and used specific HTML tags and classes to keep 
+     track of what is being edited and improve accessibility. Some challenges I encountered in this assignment include resizing the pictures and text boxes so 
+     that they look consistent and still legible, figuring out how to apply flex boxes to containers and manipulate them, and figuring out how to efficiently 
+     manipulate photos without changing the entire container. By reviewing lecture slides and using approved resources, I was able to figure these out and 
+     become a stronger web developer.
+    
+    -->
+</head>
+<body>
+
+    <h1 class="outset">Kenny Le's About Me Page</h1>
+
+    <div class="collage">
+        <!-- Orignal picture by me -->
+        <img src="img/club.jpg" class="img1" alt="Me at the VSA club at UCD">
+    </div>
+    
+    <p class="center round3"> Welcome to my about me page! My name is Kenny Le and I am an undergraduate 
+        majoring in Computer Science. Here is a closer look at my interests and life outside of school! </p>
+    <section class="outset"><strong>My favorite hobbies</strong></section>
+
+    <div class="jumper">
+        <!-- Orignal picture by me -->
+        <img src="img/jumper.jpg" class="img2" width="50%" height="auto" alt="A textbook jumpshot that needs to be studied for generations to come">
+        <p class="round3">My favorite sport is basketball! Basketball has always been a fun past time that
+            helps me stay active while allowing me to spend quality time with friends.
+            Growing up, I was surrounded by basketball. During recess, everyone would rush to the basketball courts and play pick-up. When I got home,
+            I would catch my dad watching the nightly NBA games on ESPN or ABC. Basketball was a fun way for me to bond with my friends and family.
+            Although I only play it on a casual level, I still thoroughly enjoy it because it lets me express my creative side by giving me the freedom to do whatever
+            I want to do on the court. Football and weight lifting are also two other activities that I enjoy in my free time.
+        </p>
+    </div>
+
+    <h2 class="center outset">Where I am from</h2>
+
+    <div class="collage">
+        <p class="round3">I grew up in North Highlands, Sacramento, which is a diverse part of Sacramento. Here are some pictures of me and my friends that I grew up with! </p>
+        <!-- Orignal picture by me -->
+        <img src="img/gang.jpg" class="img3" width="40%" height="auto" alt="A picture of my friends">
+        <img src="img/sac.jpg" class="img4" width="40%" height="auto" alt="My friends and I in Sacramento">
+    </div>
+
+</body>
+</html>

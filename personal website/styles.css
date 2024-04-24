@@ -1,0 +1,158 @@
+body { /* font and spacing*/
+    padding-left: 50px;
+    padding-right: 50px;
+    font-family: "PT Serif", serif;
+    background-image: linear-gradient(to bottom right, rgb(241, 145, 19), rgb(255, 255, 255));
+}
+
+.outset {
+    border-style: outset;
+}
+
+p.round3 {
+    border: 5px solid rgb(255, 175, 3);
+    border-radius: 12px;
+    padding: 5px;
+}
+
+h1 { /* website title */
+    padding-top: 10px;
+    padding-bottom: 10px;   
+    color: black;
+    text-align: center;
+    font-size: 32x;
+    font-weight: 600;
+    
+}
+
+section, h2 { /* titles/headers */
+    color: rgb(66, 66, 66);
+    font-size: 30px;
+    text-decoration: underline;
+    text-align: left;
+    padding-left: 25px;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+p {
+    font-size: 20px;
+}
+
+.center {
+    text-align: center;
+}
+
+.collage { /* img1, img3, img4 containers */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.jumper { /* basketball img2 left align */
+    display: flex;
+    align-items: left;
+    justify-content: left;
+}
+
+
+/* images */
+
+    .img1 {
+        min-width: 300px;
+        width: 30%;
+        height: auto;
+    }
+
+    .img2 {
+        max-height: 400px;
+        width: auto;
+        height: 10%;
+    }
+
+    .img3, .img4 {
+        min-width: 300px;
+        width: 20%;
+        height: auto;
+        padding-bottom: 30px;
+    }
+
+.jumper > p {
+    padding-left: 20px;
+    width: 50%;
+    margin-left: 20px;
+}
+
+.collage > p {
+    padding-left: 20px;
+    padding-right: 50px;
+    width: 50%;
+    margin-right: 20px;
+}
+
+.collage:hover, .jumper{
+    cursor: pointer;
+}
+  
+
+@media (max-width: 800px) {
+    body {
+        padding-left: 0px;
+        padding-right: 0px;
+        font-family: "PT Serif", serif;
+    }
+
+    .jumper, .collage {
+        flex-flow: column;
+        align-items: center;
+    }
+
+    .img1 {
+        min-width: 300px;
+        height: auto;
+    }
+
+    .img2 {
+        max-height: 300px;
+        width: auto;
+    }
+
+    .img3, .img4 {
+        min-width: 300px;
+        height: auto;     
+    }
+
+    h1 {
+        text-align: center;
+        font-size: 5vw;
+        font-weight: 600;
+    }
+      
+    section, h2 {
+        color: rgb(66, 66, 66);
+        font-size: 4.5vw;
+        text-decoration: underline;
+        text-align: center;
+        padding-left: 0;
+    }
+
+    section {
+        padding-bottom: 2vw;
+    }
+      
+    p {
+        font-size: 3vw;
+        text-align: center;
+    }
+
+    .collage > p {
+        text-align: center;
+        padding-right: 10px;
+        padding-left: 10px;
+        max-width: 50%;
+    }
+
+    .jumper > p {
+        padding-left: 10px;
+    }
+}
