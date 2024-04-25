@@ -18,7 +18,7 @@ body {
 }
 #top-right-logo {
   position: fixed;
-  max-width: 10%;
+  max-width: 6%;
   height: auto;
   top: 0px; /* Adjust as needed */
   right: 0px; /* Adjust as needed */
@@ -26,26 +26,26 @@ body {
 }
 #top-left-logo {
   position: fixed;
-  max-width: 10%;
+  max-width: 6%;
   height: auto;
   top: 0px; /* Adjust as needed */
-  right: 0px; /* Adjust as needed */
+  left: 0px; /* Adjust as needed */
   z-index: 999; /* Ensure the image is above other content */
 }
 #bottom-right-logo {
   position: fixed;
-  max-width: 10%;
+  max-width: 6%;
   height: auto;
-  top: 0px; /* Adjust as needed */
+  bottom: 0px; /* Adjust as needed */
   right: 0px; /* Adjust as needed */
   z-index: 999; /* Ensure the image is above other content */
 }
-#bottom-right-logo {
+#bottom-left-logo {
   position: fixed;
-  max-width: 10%;
+  max-width: 6%;
   height: auto;
-  top: 0px; /* Adjust as needed */
-  right: 0px; /* Adjust as needed */
+  bottom: 0px; /* Adjust as needed */
+  left: 0px; /* Adjust as needed */
   z-index: 999; /* Ensure the image is above other content */
 }
 .vertical-stack{
