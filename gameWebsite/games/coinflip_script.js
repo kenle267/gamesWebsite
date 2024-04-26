@@ -17,10 +17,10 @@ document.getElementById("btn").addEventListener("click", function() {
   'https://media.geeksforgeeks.org/wp-content/uploads/20231016151806/tails.png'; 
   
   coinIcon.classList.add('flip'); 
-  setTimeout(() => { 
+  setTimeout(updateHTMl = () => { // arrow function to update html with coin image and add and remove .flip class
     coinIcon.innerHTML = `<img src="${imageUrl}" alt="${side}">`; // changes the coin's image in html file
     coinIcon.classList.remove('flip');  
-    setTimeout(() => { 
+    setTimeout(updateResult = () => { // arrow function to update .result class with side coin landed on
       result.textContent = `You flipped: ${side}`; 
       result.style.opacity = 1; 
       button.disabled = false; 

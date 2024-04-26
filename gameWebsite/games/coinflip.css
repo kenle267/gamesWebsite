@@ -8,14 +8,17 @@ body {
 	font-family: "Arial", sans-serif; 
 	background: linear-gradient( 
 		135deg, 
-		#f4fb8f, 
-		#ff6b6b
+		#2b692f, 
+		#717e72
+		/* #f4fb8f, 
+		#ff6b6b */
 	); 
 	display: flex; 
 	justify-content: center; 
 	align-items: center; 
 	height: 100vh; 
 	margin: 0; 
+	flex-direction: column;
 } 
 
 .coin-container { 
@@ -34,7 +37,7 @@ body {
 	width: 80%; 
 	max-width: 500px; 
 	perspective: 1000px; 
-} 
+}
 
 h1 { 
 	color: #1ca00a; 
@@ -45,8 +48,8 @@ h1 {
 } 
 
 .coin { 
-	width: 150px; 
-	height: 150px; 
+	width: 350px; 
+	height: 350px; 
 	border-radius: 50%; 
 	overflow: hidden; 
 	box-shadow: 0 8px 20px
@@ -68,7 +71,7 @@ button {
 	transition: background-color 0.3s 
 			ease-in-out, 
 		transform 0.2s ease-in-out; 
-	width: 100%; 
+	width: 150px;
 	margin-top: 20px; 
 } 
 
@@ -76,7 +79,7 @@ button:hover {
 	background-image: linear-gradient( 
 		45deg, 
 		#4e6bff, 
-		#ff6b6b
+		#2b692f
 	); 
 	transform: scale(1.05); 
 } 
