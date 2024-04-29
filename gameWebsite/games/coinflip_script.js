@@ -1,7 +1,7 @@
 const result = document.querySelector('.result'); 
-const coinIcon = document.getElementById('coin'); 
+const coinImg = document.getElementById('coin'); 
 const button =  document.getElementById('btn'); 
-coinIcon.insertAdjacentElement('afterend', result); // places result right after coin image and before flip button
+coinImg.insertAdjacentElement('afterend', result); // places result right after coin image and before flip button
 
 document.getElementById("btn").addEventListener("click", function() {
   let side; // the side the coin lands on
@@ -16,10 +16,10 @@ document.getElementById("btn").addEventListener("click", function() {
   'https://media.geeksforgeeks.org/wp-content/uploads/20231016151817/heads.png' : 
   'https://media.geeksforgeeks.org/wp-content/uploads/20231016151806/tails.png'; 
   
-  coinIcon.classList.add('flip'); 
+  coinImg.classList.add('flip'); 
   setTimeout(updateHTMl = () => { // arrow function to update html with coin image and add and remove .flip class
-    coinIcon.innerHTML = `<img src="${imageUrl}" alt="${side}">`; // changes the coin's image in html file
-    coinIcon.classList.remove('flip');  
+    coinImg.innerHTML = `<img src="${imageUrl}" alt="${side}">`; // changes the coin's image in html file
+    coinImg.classList.remove('flip');  
     setTimeout(updateResult = () => { // arrow function to update .result class with side coin landed on
       result.textContent = `You flipped: ${side}`; 
       result.style.opacity = 1; 
