@@ -1,24 +1,26 @@
 const result = document.querySelector('.result'); 
-const coinIcon = document.getElementById('coin'); 
-const button =  document.getElementById('btn'); 
+const coinIcon = document.getElementById('coinIcon'); 
+const button =  document.getElementById('btn');
+const balance = document.getElementById('balance');
 coinIcon.insertAdjacentElement('afterend', result); // places result right after coin image and before flip button
+let balanceTotal = 100;
 
 document.getElementById("btn").addEventListener("click", function() {
   let side; // the side the coin lands on
-  let imageUrl; // picture of the side
+  let image; // picture of the side
   const randomVal = Math.random(); // random val between [0,1]
   if (randomVal < 0.5) {
     side = 'Heads';
   } else {
     side = 'Tails';
   }
-  imageUrl = side === 'Heads' ? 
-  'https://media.geeksforgeeks.org/wp-content/uploads/20231016151817/heads.png' : 
-  'https://media.geeksforgeeks.org/wp-content/uploads/20231016151806/tails.png'; 
+  image = side === 'Heads' ? 
+  "heads.png" : 
+  "tails.png"; 
   
   coinIcon.classList.add('flip'); 
-  setTimeout(updateHTMl = () => { // arrow function to update html with coin image and add and remove .flip class
-    coinIcon.innerHTML = `<img src="${imageUrl}" alt="${side}">`; // changes the coin's image in html file
+  setTimeout(updateImage = () => { // arrow function to update html with coin image and add and remove .flip class
+    coinIcon.src = image;
     coinIcon.classList.remove('flip');  
     setTimeout(updateResult = () => { // arrow function to update .result class with side coin landed on
       result.textContent = `You flipped: ${side}`; 

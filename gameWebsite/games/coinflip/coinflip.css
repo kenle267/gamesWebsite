@@ -1,8 +1,53 @@
+#top-right-logo {
+	position: fixed;
+	max-width: 6%;
+	height: auto;
+	top: 0px; /* Adjust as needed */
+	right: 0px; /* Adjust as needed */
+	z-index: 999; /* Ensure the image is above other content */
+}
+#top-left-logo {
+	position: fixed;
+	max-width: 6%;
+	height: auto;
+	top: 0px; /* Adjust as needed */
+	left: 0px; /* Adjust as needed */
+	z-index: 999; /* Ensure the image is above other content */
+}
+#bottom-right-logo {
+	position: fixed;
+	max-width: 6%;
+	height: auto;
+	bottom: 0px; /* Adjust as needed */
+	right: 0px; /* Adjust as needed */
+	z-index: 999; /* Ensure the image is above other content */
+}
+#bottom-left-logo {
+	position: fixed;
+	max-width: 6%;
+	height: auto;
+	bottom: 0px; /* Adjust as needed */
+	left: 0px; /* Adjust as needed */
+	z-index: 999; /* Ensure the image is above other content */
+}
+
+.container {
+	max-width: 800px;
+	margin: 50px auto;
+	padding: 60px;
+	background-color: #475407;
+	border-radius: 8px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
 * { 
 	margin: 0; 
 	padding: 0; 
 	box-sizing: border-box; 
 } 
+#horizontal{
+	display: flex;
+	flex-direction: column;
+}
 
 body { 
 	font-family: "Arial", sans-serif; 
@@ -60,22 +105,22 @@ h1 {
 	backface-visibility: hidden; 
 } 
 
-button { 
+#btn { 
 	background-color: #4e6bff; 
 	color: #fff; 
 	border: none; 
 	padding: 10px 20px; 
 	border-radius: 10px; 
-	font-size: 1rem; 
+	font-size: 10pt; 
 	cursor: pointer; 
 	transition: background-color 0.3s 
 			ease-in-out, 
 		transform 0.2s ease-in-out; 
 	width: 150px;
-	margin-top: 20px; 
+	margin-top: 20px;
 } 
 
-button:hover { 
+#btn:hover { 
 	background-image: linear-gradient( 
 		45deg, 
 		#4e6bff, 
