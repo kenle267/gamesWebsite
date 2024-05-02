@@ -2,8 +2,11 @@
   text-align: center;
 }
 body {
-  background-color: rgb(43, 35, 35);
+  background-image: url(./imgs/casinogreen.jpg);
+  background-size: cover;
 }
+
+
 #mainHeader{
   text-align: center;
   font-family: 'Trebuchet MS', sans-serif;
