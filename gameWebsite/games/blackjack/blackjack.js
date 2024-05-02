@@ -15,7 +15,7 @@ var yourAceCount = 0; //A, 2 -> 11 + 2 + 10 or 1 + 2 + 10
 
 var hidden; // dealer starts with 1 hidden card, 1 visible
 var deck;
-var canHit = true; //allows the player (you) to draw while yourSum <= 21
+var canHit = false; //allows the player (you) to draw while yourSum <= 21
 var blackjack = false;
 var doubleDown = false;
 var push = false;
@@ -56,6 +56,7 @@ function bet() {
   })
 
     .then((validInput) => {
+      document.getElementById("start").style.display = "none";
       startGame();
     }).catch((error) => {
       console.error(error);
@@ -161,6 +162,7 @@ function startGame() {
     
       return; // End the game
     }
+    canHit = true; // player is allowed to hit now that game has started
 
     console.log("This is yourSum")
     console.log(yourSum);
@@ -202,6 +204,10 @@ function hit() {
 }
 
 function stay() {
+  if (!numCards >= 2) { // prevents player from calling stay after invalid input
+    return;
+  }
+  
   // total both sums
   dealerSum = reduceAce(dealerSum, dealerAceCount);
   yourSum = reduceAce(yourSum, yourAceCount);
@@ -303,13 +309,13 @@ function reduceAce(playerSum, playerAceCount) { // only reduces by 1 ace at a ti
 }
 
 function restartGame() {
-  document.getElementById("start").style.display = "none";
+  // document.getElementById("start").style.display = "none";
 
   dealerSum = 0;
   yourSum = 0;
   dealerAceCount = 0;
   yourAceCount = 0;
-  canHit = true;
+  canHit = false;
   numCards = 0;
   blackjack = false;
   playerWins = false;
