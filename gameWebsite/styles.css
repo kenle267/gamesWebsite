@@ -1,0 +1,94 @@
+.center {
+  text-align: center;
+}
+body {
+  background: rgb(43, 35, 35);
+}
+#mainHeader{
+  text-align: center;
+  font-family: 'Trebuchet MS', sans-serif;
+  font-size: 36pt;
+  background-color: #475407;
+  max-width: 900px;
+  margin: auto;
+  margin-top: 0px;
+  margin-bottom: 50px;
+  border-radius: 10px;
+  line-height: 1.5;
+}
+#top-right-logo {
+  position: fixed;
+  max-width: 6%;
+  height: auto;
+  top: 0px; /* Adjust as needed */
+  right: 0px; /* Adjust as needed */
+  z-index: 999; /* Ensure the image is above other content */
+}
+#top-left-logo {
+  position: fixed;
+  max-width: 6%;
+  height: auto;
+  top: 0px; /* Adjust as needed */
+  left: 0px; /* Adjust as needed */
+  z-index: 999; /* Ensure the image is above other content */
+}
+#bottom-right-logo {
+  position: fixed;
+  max-width: 6%;
+  height: auto;
+  bottom: 0px; /* Adjust as needed */
+  right: 0px; /* Adjust as needed */
+  z-index: 999; /* Ensure the image is above other content */
+}
+#bottom-left-logo {
+  position: fixed;
+  max-width: 6%;
+  height: auto;
+  bottom: 0px; /* Adjust as needed */
+  left: 0px; /* Adjust as needed */
+  z-index: 999; /* Ensure the image is above other content */
+}
+.vertical-stack{
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+.mainImages{
+  width : 250px;
+  height : auto;
+  border-radius: 10px;
+}
+
+.mainImages:hover {
+  cursor: pointer;
+}
+
+.image-title{
+  display: flex;
+  flex-direction: column;
+  font-size: 25px;
+  font-family: 'Trebuchet MS', sans-serif;
+  text-align: center;
+  background-color: #475407;
+  border-radius: 10px;
+  line-height: .1;
+}
+
+@media screen and (min-width: 769px) {
+  .horizontal-stack {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 30px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .horizontal-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+  }
+}
