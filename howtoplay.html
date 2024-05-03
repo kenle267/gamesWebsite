@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="styles.css" type="text/css" rel="stylesheet">
+  <script src="script.js" type="text/javascript"></script>
+  <title>Renny's Casino</title>
+</head>
+<body>
+  <header>
+    <h1 id = "mainHeader">Welcome To Renny's Casino!</h1>
+  </header>
+
+  <nav class="navbar">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="howtoplay.html">How to Play</a></li>
+    </ul>
+  </nav>
+
+  <img src="imgs/dice.gif" alt="Dice gif" id="top-right-logo">
+  <img src="imgs/dice.gif" alt="Dice gif" id="top-left-logo">
+  <img src="imgs/dice.gif" alt="Dice gif" id="bottom-right-logo">
+  <img src="imgs/dice.gif" alt="Dice gif" id="bottom-left-logo">
+
+  <h2>How to Play</h2>
+  <section>
+    <div>
+      <p>Blackjack<p>
+      <a href="games/blackjack/blackjack.html"><img src = "imgs/blackjack.jpg" alt = "image of blackjack game" title = "Blackjack" class = "mainImages"></a>
+    </div>
+    <div class="instruction">
+      <p>Blackjack is one of the most popular card games in the world. The main goal is to get closer to 21 than the dealer without going over.
+
+        <p>Card Values:
+        Number cards (2-10) are equal face value.
+        Face cards like Jack, Queen, King equal 10.
+        Aces can equal 1 or 11, it is up to the player to choose.</p>
+
+        <p>Gameplay:
+        Dealer and player starts with 2 cards, but dealer starts with 1 card face down.
+        The player goes first and can choose to "hit" (receive another card) or "stand" (keep their current hand).
+        If the player's hand exceeds 21 points, they "bust" and lose the round.
+        After the player stands, the dealer reveals their faced-down card.
+        The dealer must hit until their hand value is at least 17. If the dealer's hand exceeds 21, they bust and the player wins.
+        If neither the player nor the dealer busts, the hand closer to 21 wins.</p>
+
+        <p>Winning and Losing:
+        If the player's hand is closer to 21 than the dealer's hand without exceeding 21, the player wins and is paid out at even money (1:1).
+        If the player's hand exceeds 21, they bust and lose the round, regardless of the dealer's hand.
+        If the player and dealer have hands of equal value, it's a "push," and the player's bet is returned.
+        If the player's starting hand, the 2 intial cards, have a value of 21, then the player has blackjack and wins, unless the dealer also has blackjack as well (push).
+        Blackjacks are paid out at 3:2 ratio.</p>
+
+        <p>Special Moves: Double Down: After receiving the first two cards,
+        the player can choose to double their original bet, but the caviat is that they can only hit once.</p>
+    </div>
+  </section>
+
+  <section> 
+    <div>
+      <p>Slots<p>
+      <a href="games/slots/slots.html"><img src = "imgs/slots.jpg" alt = "image of slots game" title = "Slots" class = "mainImages"></a>
+    </div>
+    <div class="instruction">
+      <p>A slot machine is an infamous Casino game, where you pull a lever, and each slot on the machine will roll a certain icon</p>
+      <p>
+        Payouts:
+        For our slot machine game, there are 3 different payouts. Cherries, Bananas, and Gold. The cherry icon has the
+        highest chance of appearing, so 3 cherry slots will payout 8 times your money. The banana is the second most likely, and 
+        3 banana slots will payout 15 times your money. Lastly the gold icon is the jackpot, where it will payout 1000 times your bet.
+      </p>
+      <p>
+        Gameplay:
+        To play, first enter a bet amount, which must be a valid integer, and it must not exceed your current balance.
+        After this, simply click spin, and cross your fingers.
+      </p>
+    </div>
+  </section>
+
+  <section> 
+    <div>
+      <p>Roulette<p>
+      <a href="games/roulette/roulette.html"><img src = "imgs/roulette.jpg" alt = "image of roulette game" title = "Roulette" class = "mainImages"></a>
+    </div>
+    <div class="instruction">
+      <p>Roulette is a casino standard, and is often considered the most straight forward way to gamble.</p>
+      <p>
+        Payouts:
+        For our roulette game, there are a few different outcomes you can bet on. Usually in regular roulette, you can bet on color, even/odd, singular numbers
+        , and ranges of numbers. However for our game, you can only bet on red/black, even/odd, or the lucky 00 green. Winning a bet on Red/Black or 
+        Even/Odd will payout 2 times your money. Sucessfully payouting a green bet will give 36 times your bet amount.
+      </p>
+      <p>
+        Gameplay:
+        To play, first enter your bet type, black/red/even/odd/green. Enter a bet amount, which must be a valid integer, and it must not 
+        exceed your current balance. After this, simply click spin, and cross your fingers.
+      </p>
+    </div>
+  </section>
+
+  <section> 
+    <div>
+      <p>Coin Flip<p>
+      <a href="games/coinflip/coinflip.html"><img src = "imgs/coinflip.jpg" alt = "image of coin flip game" title = "Coin Flip" class = "mainImages"></a>
+    </div>
+    <div class="instruction">
+      <p> Coin flip is a timeless game used to settle many disputes or make life changing decisions. 
+        Click the side of the coin that you think the coin will land on, enter a bet amount, and click "Flip Coin" to play. </p>
+      <p>
+        Payouts:
+        For our coinflip game, the payouts are as expected. If you correctly guess the side, you will double your bet amount.
+      </p>
+      <p>
+        Gameplay:
+        To play, first enter a bet amount, which must be a valid integer, and it must not 
+        exceed your current balance. After this, simply click flip, and cross your fingers.
+      </p>
+    </div>
+  </section>
+  <footer>
+    <p>Copyright @ 2024 Renny's Casino. All rights reserved. Open-source game credit: Blackjack - Developed by doroshm. Licensed under MIT</p>
+    <p>Disclaimer: We are not responsible for any adopted addictions. All money on site is not real.</p>
+  </footer>
+</body>
+</html>

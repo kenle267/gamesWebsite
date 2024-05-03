@@ -1,0 +1,89 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #222;
+  color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  flex-direction: column;
+}
+
+.container {
+  margin: 0px;
+  text-align: center;
+  max-width: 600px;
+  padding: 20px;
+  background: linear-gradient(to right, 
+    red, orange, yellow, green, blue, indigo, violet);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.slots {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+.slot {
+  width: 120px;
+  height: 120px;
+  border: 2px solid #fff;
+  border-radius: 8px;
+  background-color: #333;
+}
+.slot img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.horizontal {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+#spinButton{
+  background-color: #4e6bff; 
+	color: #fff; 
+	border: none; 
+	padding: 10px 20px; 
+	border-radius: 10px; 
+	font-size: 10pt; 
+	cursor: pointer; 
+	transition: background-color 0.3s 
+			ease-in-out, 
+		transform 0.2s ease-in-out; 
+	width: 150px;
+	height: 50px;
+	margin-top: 20px;
+}
+
+#balance {
+  color: black;
+  background-color: #eee;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+#result {
+  font-weight: bold;
+  font-size: 20pt;
+}
+
+.spin {
+  animation: spin-animation 2s linear infinite;
+}
+
+@keyframes spin-animation {
+  from {
+      transform: rotate(0deg);
+  }
+  to {
+      transform: rotate(360deg);
+  }
+}
