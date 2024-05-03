@@ -41,6 +41,7 @@ function playRoulette() {
         return;
     }//input validation
     balance -= betAmount; //deduct bet from balance
+    document.getElementById('balance').textContent = `Balance: ${balance} credits`;
 
     document.querySelector('button').disabled = true; //disables button while animation is going
     let result = spinWheel();

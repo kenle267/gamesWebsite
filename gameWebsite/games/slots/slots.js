@@ -38,10 +38,29 @@ function updateSlots() {
   });
 }
 
+function checkInput(){
+  const betValue = parseInt(betAmount.value);
+  if (isNaN(betValue) || betValue <= 0 || Number.isInteger(betValue) == false) {
+    alert('Please enter a valid bet amount.');
+    return false;
+  }
+
+  if (betValue > balance) {
+    alert('Insufficient Balance');
+    return false;
+  }
+
+  return true;
+}
+
 // Main function to do the logic of the roll
 spinButton.addEventListener('click', function() {
+  if (!checkInput()) {
+    return; // If input validation fails, exit early
+  }
   balance -= parseInt(betAmount.value);
   balanceDisplay.textContent = `${balance} credits`;
+  document.getElementById('spinButton').disabled = true;
   // Add spinning animation class, to begin the spin
   slots.forEach(slot => {
     slot.classList.add('spin');
@@ -68,6 +87,7 @@ spinButton.addEventListener('click', function() {
       }
       // Update balance based on win or loss
       if (isWin) {
+        document.getElementById('result').textContent = `Congratulations! You win!`;
         switch (firstIcon) {
           case 'cherry':
             balance += parseInt(betAmount.value) * 8;
@@ -81,9 +101,13 @@ spinButton.addEventListener('click', function() {
           default:
             break;
           }
+      }else{
+        document.getElementById('result').textContent = `Sorry! You Lost!`;
       }
       // Update balance on html
       balanceDisplay.textContent = `${balance} credits`;
+      document.getElementById('result')
+      document.getElementById('spinButton').disabled = false;
     }, 1000); // Delay after stopping spinning
-  }, 3000); // Duration of spinning animation
+  }, 2000); // Duration of spinning animation
 });

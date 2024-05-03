@@ -14,7 +14,8 @@ body {
   text-align: center;
   max-width: 600px;
   padding: 20px;
-  background-color: #475407;
+  background: linear-gradient(to right, 
+    red, orange, yellow, green, blue, indigo, violet);
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
@@ -67,6 +68,11 @@ body {
   padding: 5px 10px;
   border-radius: 4px;
   font-weight: bold;
+}
+
+#result {
+  font-weight: bold;
+  font-size: 20pt;
 }
 
 .spin {

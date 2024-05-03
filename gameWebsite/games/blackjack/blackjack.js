@@ -1,8 +1,17 @@
-// adapted from github link: https://github.com/ImKennyYip/black-jack
-// tutorial YT link: https://www.youtube.com/watch?v=bMYCWccL-3U&ab_channel=KennyYipCoding
+// adapted from github link: https://github.com/doroshm/BlackJack
 
-// main changes: made a draw card function for dealer and player, Deal() and Draw() respectively
-// moved around ordering and special cases to realistically replicate a black jack game
+// Main Changes/Adaptions: 
+// -made a draw card function for dealer and player, Deal() and Draw() respectively
+// -Reordered functions, added special cases, and changed timings to realistically replicate a black jack game
+// -refactored functions to be more accurate with their name and actual uses
+// -ommitted sound volumes
+// -used promises to do input validation
+// -added a double down feature, to allow for more realistic gameplay
+// -combined files to allow for less folder clutter
+// -renamed some variables for readablity
+// -changed betting system to align with rest of website
+// -changed inputs and outputs of elements to align with html and website flow
+// -Made major style changes to flow better with style of full site, like button hovers, layout, and colors
 
 // INTIALIZE GLOBAL VARIABLES (hence var instead of let)
 var dealerSum = 0;
@@ -26,14 +35,9 @@ var playerWins = false;
 
 window.onload = function() { 
   document.getElementById("restart").style.display = "none";
-  initDeck(); // 2 for loops to loop through all 52 cards
-  shuffleDeck(); // need to shuffle or else cards will be in order as it loops thru ranks and suits
-
   document.getElementById("start").addEventListener("click", () => {
     restartGame();
-    document.getElementById("start").disabled = true;
   });
-
 }
 
 function bet() {
@@ -81,7 +85,7 @@ function initDeck() {
   // console.log(deck);
 }
 
-function shuffleDeck() {
+function shuffleDeck() { // goes through every card 
   for (let i=0; i < deck.length; i++) {
     let j = Math.floor(Math.random() * deck.length); // [0,1] * 52 => (0,51.9999) 0-indexed
     let temp = deck[i];
@@ -173,11 +177,6 @@ function startGame() {
       return; // End the game
     }
     canHit = true; // player is allowed to hit now that game has started
-
-    // console.log("This is yourSum")
-    // console.log(yourSum);
-    // console.log("This is dealerSum")
-    // console.log(dealerSum);
     document.getElementById("hit").addEventListener("click", hit);
     document.getElementById("stay").addEventListener("click", stay);
     document.getElementById("double").addEventListener("click", double);
@@ -199,8 +198,8 @@ function hit() {
     canHit = false;
     let message = "Bust! You Lose!"
     document.getElementById("results").innerText = message;
-    document.getElementById("dealerSum").innerText = dealerSum;
-    document.getElementById("yourSum").innerText = yourSum;
+    document.getElementById("dealerSum").innerText = reduceAce(dealerSum, dealerAceCount);
+    document.getElementById("yourSum").innerText = reduceAce(yourSum, yourAceCount);
     
     document.getElementById("hidden").src = "./cards/" + hidden + ".png"; // reveal dealer's hidden card
 
@@ -213,7 +212,7 @@ function hit() {
   }
 }
 
-function stay() {
+function stay() { // player keeps hand, what happens when it's Dealer's turn
   if (!numCards >= 2) { // prevents player from calling stay after invalid input
     return;
   }
@@ -227,23 +226,19 @@ function stay() {
   flipHidden();
 
   setTimeout(() => {
-    // Dealer Blackjack case
+    // Check for Dealer Blackjack case
     if (dealerSum == 21) {
       let message = "Blackjack! You Lose!"
       document.getElementById("results").innerText = message;
       return; // end the game if blackjack is achieved
     }
-
+    
     // DEALER'S TURN
     // Dealer ontinues to hit until >= 17
-
     while (dealerSum < 17) {
       Deal();
       document.getElementById("dealerSum").innerText = dealerSum;
     }
-    // console.log("This is dealerSum after hitting")
-    // console.log(dealerSum);
-
     // result messages
     let message = "";
     if (yourSum > 21) {
@@ -265,10 +260,9 @@ function stay() {
     else if (yourSum < dealerSum) {
       message = "You Lose!";
     }
-
     // Payouts
     if (playerWins) { // player wins
-      let winnings = (doubleDown) ? betAmount * 3 : betAmount * 2; // doubledowwn 2:1 others pay 1:1
+      let winnings = (doubleDown) ? betAmount * 4 : betAmount * 2; // doubledowwn 2:1 others pay 1:1
       console.log(`Congratulations! You win ${winnings} credits.`);
       balance += winnings; // Add winnings to balance
       document.getElementById('winnings').textContent = `Congratulations! You win ${winnings} credits.`;
@@ -278,19 +272,16 @@ function stay() {
       console.log("Sorry, you lose/pushed.");
     }
     document.getElementById('balance').textContent = `Balance: ${balance} credits`;
-
     document.getElementById("dealerSum").innerText = dealerSum;
     document.getElementById("yourSum").innerText = yourSum;
     document.getElementById("results").innerText = message;
-    
     document.getElementById("hit").disabled = true;
     document.getElementById("stay").disabled = true;
     document.getElementById("double").disabled = true;
-
   }, 400)
 }
 
-function getValue(card) {
+function getValue(card) { // returns the value of the card
   let data = card.split("-"); // e.g. "4-C" calling split on "-" splits the values into 2, ["4", "C"]
   let value = data[0];
   
@@ -301,7 +292,6 @@ function getValue(card) {
     return 10; // face card, return 10
   }
   return parseInt(value); // else return value of the number card
-
 }
 
 function checkAce(card) { // return 1 if ace, else 0
@@ -319,9 +309,8 @@ function reduceAce(playerSum, playerAceCount) { // only reduces by 1 ace at a ti
   return playerSum;
 }
 
-function restartGame() {
+function restartGame() { // restarts the game and resets all variables
   // document.getElementById("start").style.display = "none";
-
   dealerSum = 0;
   yourSum = 0;
   dealerAceCount = 0;
@@ -333,7 +322,6 @@ function restartGame() {
   betAmount = 0;
   doubleDown = false;
   push = false;
-  
   // Clear dealer and player cards
   document.getElementById("dealerCards").innerHTML = '<img id="hidden" src="./cards/BACK.png">';
   document.getElementById("yourCards").innerHTML = "";
@@ -353,7 +341,6 @@ function double() { // doubles the original bet on current hand, but can only hi
   if (numCards != 2) { // should only be able to double down if player hasn't hit yet & player has enough credits
     return;
   }
-
   doubleDown = true;
 
   if (betAmount > balance) {
@@ -367,7 +354,7 @@ function double() { // doubles the original bet on current hand, but can only hi
 
   if (reduceAce(yourSum, yourAceCount) > 21) { // A,J,K -> 11 + 10 + 10 = 31 or 1 + 10 + 10 = 21
     canHit = false;
-    let message = "Bust! You Lose!"
+    let message = "Bust! You Lose!";
     document.getElementById("results").innerText = message;
     document.getElementById("dealerSum").innerText = dealerSum;
     document.getElementById("yourSum").innerText = yourSum;
@@ -382,7 +369,7 @@ function double() { // doubles the original bet on current hand, but can only hi
   stay();
 }
 
-function flipHidden() {
+function flipHidden() { // flips the dealer's hidden card at the end of the game
   document.getElementById("hidden").classList.add('flip'); 
   setTimeout(() => {
     document.getElementById("hidden").classList.remove('flip'); 

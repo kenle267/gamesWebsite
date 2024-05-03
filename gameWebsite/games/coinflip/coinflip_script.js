@@ -70,9 +70,13 @@ document.getElementById("btn").addEventListener("click", function() {
   image = side === 'Heads' ? 
   "heads.png" : 
   "tails.png"; 
+  balanceTotal -= parseInt((betAmount.value))
+  document.getElementById('balance').textContent = `${balanceTotal}`;
   
   coinIcon.classList.add('flip'); //Starts flip animation
   button.disabled = true; // Disable clicking while flipping
+  buttonHeads.disabled = true;
+  buttonTails.disabled = true;
   setTimeout(updateImage = () => { // arrow function to update html with coin image and add and remove .flip class
     coinIcon.src = image;
     coinIcon.classList.remove('flip');  
@@ -84,12 +88,11 @@ document.getElementById("btn").addEventListener("click", function() {
       result.style.textAlign = "center";
       if (side === selectedChoice) {
           // Win scenario: Increase balance
-          balanceTotal += parseInt(betAmount.value);
-      } else {
-          // Lose scenario: Decrease balance
-          balanceTotal -= parseInt((betAmount.value));
+          balanceTotal += parseInt(betAmount.value) * 2;
       }
-      button.disabled = false; 
+      button.disabled = false;
+      buttonHeads.disabled = false;
+      buttonTails.disabled = false;
       document.getElementById('balance').textContent = `${balanceTotal}`;
     }, 200); 
   }, 1000); 

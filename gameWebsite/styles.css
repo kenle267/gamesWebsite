@@ -41,7 +41,7 @@ label{
 
 .navbar ul{
   list-style-type: none;
-  background-color: rgb(16, 85, 16);
+  background-color: #721411;
   padding: 20px;
   margin: 0;
   overflow: hidden;
@@ -68,7 +68,7 @@ label{
   text-align: center;
   font-family: 'Trebuchet MS', sans-serif;
   font-size: 36pt;
-  background-color: #475407;
+  background-color: #721411;
   max-width: 900px;
   margin: auto;
   margin-top: 15px;
@@ -130,7 +130,7 @@ label{
   font-size: 25px;
   font-family: 'Trebuchet MS', sans-serif;
   text-align: center;
-  background-color: #475407;
+  background-color: #721411;
   border-radius: 10px;
   line-height: .1;
 }
