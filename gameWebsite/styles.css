@@ -80,33 +80,33 @@ label{
   position: fixed;
   max-width: 6%;
   height: auto;
-  top: 0px; /* Adjust as needed */
-  right: 0px; /* Adjust as needed */
-  z-index: 999; /* Ensure the image is above other content */
+  top: 0px;
+  right: 0px;
+  z-index: 999;
 }
 #top-left-logo {
   position: fixed;
   max-width: 6%;
   height: auto;
-  top: 0px; /* Adjust as needed */
-  left: 0px; /* Adjust as needed */
-  z-index: 999; /* Ensure the image is above other content */
+  top: 0px;
+  left: 0px;
+  z-index: 999;
 }
 #bottom-right-logo {
   position: fixed;
   max-width: 6%;
   height: auto;
-  bottom: 0px; /* Adjust as needed */
-  right: 0px; /* Adjust as needed */
-  z-index: 999; /* Ensure the image is above other content */
+  bottom: 0px;
+  right: 0px;
+  z-index: 999;
 }
 #bottom-left-logo {
   position: fixed;
   max-width: 6%;
   height: auto;
-  bottom: 0px; /* Adjust as needed */
-  left: 0px; /* Adjust as needed */
-  z-index: 999; /* Ensure the image is above other content */
+  bottom: 0px;
+  left: 0px;
+  z-index: 999;
 }
 .vertical-stack{
   display:flex;
@@ -143,13 +143,11 @@ label{
       gap: 30px;
   }
 
-  /* how to play - css */
   section {
     font-size: 24pt;
     text-align: left;
     padding-left: 7%;
     width: 85%;
-    /* min-width: 60%; */
     display: flex;
     flex-direction: row;
   }
@@ -169,13 +167,11 @@ label{
       gap: 30px;
   }
 
-  /* how to play - css */
   section {
     font-size: 24pt;
     text-align: left;
     padding-left: 7%;
     width: 85%;
-    /* min-width: 60%; */
     display: flex;
     flex-direction: column;
   }

@@ -2,6 +2,7 @@
 
 // Main Changes/Adaptions: 
 // -made a draw card function for dealer and player, Deal() and Draw() respectively
+// -combined the reducedealer and reduceplayer function because they were similar and redundant
 // -Reordered functions, added special cases, and changed timings to realistically replicate a black jack game
 // -refactored functions to be more accurate with their name and actual uses
 // -ommitted sound volumes
@@ -33,14 +34,14 @@ var balance = 100;
 var betAmount;
 var playerWins = false;
 
-window.onload = function() { 
+window.onload = function() { //on load, hide restart button, eventlistener for start button
   document.getElementById("restart").style.display = "none";
   document.getElementById("start").addEventListener("click", () => {
     restartGame();
   });
 }
 
-function bet() {
+function bet() { // takes in bet and input validation
   document.getElementById("stay").disabled = true;
   return new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -70,7 +71,7 @@ function bet() {
     });
 }
 
-function initDeck() {
+function initDeck() { // init deck using 2 for loops and string concatenation
   let values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q" ,"K"]; // RANKS
   let types = ["C", "D", "H", "S"]; // SUITS: clubs, diamonds, hearts, 
   deck = []; // DECK array
@@ -85,7 +86,7 @@ function initDeck() {
   // console.log(deck);
 }
 
-function shuffleDeck() { // goes through every card 
+function shuffleDeck() { // goes through every card and switches
   for (let i=0; i < deck.length; i++) {
     let j = Math.floor(Math.random() * deck.length); // [0,1] * 52 => (0,51.9999) 0-indexed
     let temp = deck[i];
@@ -96,7 +97,7 @@ function shuffleDeck() { // goes through every card
   console.log(deck);
 }
 
-function Deal() { // specifically hardcoded for dealer,, do not get confused with "DEAL" button
+function Deal() { // specifically hardcoded drawing function for dealer,, do not get confused with "DEAL" button
   let cardImg = document.createElement("img") //create <img> tag to represent drawing a card
   let card = deck.pop(); // draw card
   // set the src image to that card's image
@@ -185,7 +186,7 @@ function startGame() {
   }, 1200)
 }
 
-function hit() {
+function hit() { // draw card function for player
   if (!canHit) {
     return;
   }
@@ -193,7 +194,7 @@ function hit() {
   // if canHit, give yourself a card
   Draw();
 
-  // case: bust first
+  // case: player busts first
   if (reduceAce(yourSum, yourAceCount) > 21) { // A,J,K -> 11 + 10 + 10 = 31 or 1 + 10 + 10 = 21
     canHit = false;
     let message = "Bust! You Lose!"
