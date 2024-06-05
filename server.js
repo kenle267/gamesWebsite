@@ -2,6 +2,19 @@ const express = require('express');
 const expressHandlebars = require('express-handlebars');
 const session = require('express-session');
 const canvas = require('canvas');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const crypto = require('crypto');
+require('dotenv').config();
+const accessToken = process.env.EMOJI_API_KEY;
+const { initializeDB } = require('./populatedb');
+const sqlite = require('sqlite');
+const sqlite3 = require('sqlite3');
+const { readdirSync } = require('fs');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const sharp = require('sharp');
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Configuration and Setup
@@ -9,6 +22,58 @@ const canvas = require('canvas');
 
 const app = express();
 const PORT = 3000;
+
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+
+// Configure passport
+passport.use(new GoogleStrategy({
+    clientID: CLIENT_ID,
+    clientSecret: CLIENT_SECRET,
+    callbackURL: `http://localhost:${PORT}/auth/google/callback`
+}, (token, tokenSecret, profile, done) => {
+    console.log(profile);
+    return done(null, profile);
+}));
+
+passport.serializeUser((user, done) => {
+    done(null, user);
+});
+
+passport.deserializeUser((obj, done) => {
+    done(null, obj);
+});
+
+// Establish connection to database
+async function getDBConnection() {
+    const db = await sqlite.open({
+        filename: 'your_database_file.db',
+        driver: sqlite3.Database
+    });
+    return db;
+}
+
+// Fetch posts and useres arrays from db
+async function initializeData() {
+    try {
+        await initializeDB();
+        console.log('Data initialized from database.');
+    } catch (error) {
+        console.error('Error initializing database:', error);
+    }
+}
+
+// assign database and call init posts and users in initializeData()
+let db;
+(async () => {
+    try {
+        db = await getDBConnection();
+        console.log('Database connection established successfully!');
+        await initializeData();
+    } catch (error) {
+        console.error('Error establishing database connection:', error);
+    }
+})();
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -75,7 +140,7 @@ app.use(
 // should be used in your template files. 
 // 
 app.use((req, res, next) => {
-    res.locals.appName = 'RennyGram';
+    res.locals.appName = 'MusiGram';
     res.locals.copyrightYear = 2024;
     res.locals.postNeoType = 'Post';
     res.locals.loggedIn = req.session.loggedIn || false;
@@ -95,14 +160,163 @@ app.use(express.json());                            // Parse JSON bodies (as sen
 // We pass the posts and user variables into the home
 // template
 //
-app.get('/', (req, res) => {
-    const posts = getPosts();
-    const user = getCurrentUser(req) || {};
-    res.render('home', { posts, user });
+app.get('/', async (req, res) => {
+    const posts = await getPosts();
+    const user = await getCurrentUser(req) || {};
+    res.render('home', { posts, user, apikey: accessToken});
+});
+
+app.post('/deleteReply/:id', isAuthenticated, async (req, res) => {
+    // TODO: Delete a reply if the current user is the owner
+    const user = await getCurrentUser(req) || {}; // get current user
+    const replyId = parseInt(req.params.id); // get post id from url
+    
+    try {
+        const replyToDelete = await db.get('SELECT * FROM replies WHERE id = ?', [replyId]);
+
+        if (!replyToDelete) { // if reply doesn't exist
+            return res.status(404).send('Reply not found');
+        }
+
+        if (replyToDelete.username !== user.username) { // safeguard against deleting others replies
+            return res.status(403).send('You are not allowed to delete other users\' posts');
+        }
+
+        await db.run('DELETE FROM replies WHERE id = ?', [replyId]); // delete from database
+        res.send('Reply successfully deleted');
+    } catch (error) {
+        console.error('Error deleting reply:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.post('/postReply',async (req, res) => {
+    //TODO: Add a new reply and redirect to home
+
+    const title = req.body.title;
+    const content = req.body.content;
+    const user = await getCurrentUser(req);
+    const postId = req.body.postId;
+
+    if (user) {
+        await addReply(content, user, postId);
+        res.redirect('/');
+    } else {
+        res.redirect('/login');
+    }
+});
+
+// Function to add a new reply
+async function addReply(content, user, postId) {    
+    // TODO: Create a new reply object and add to reply array
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const day = String(currentDate.getDate()).padStart(2, '0');
+    const hours = String(currentDate.getHours()).padStart(2, '0');
+    const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+    const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+    const timestamp = year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
+    
+    try {
+        await db.run('INSERT INTO replies (content, username, repliedToId, timestamp) VALUES (?, ?, ?, ?)', [content, user.username, postId, timestamp]);
+        console.log('reply added to database.');
+    } catch (error) {
+        console.error('Error adding reply to database:', error);
+    }
+}
+
+// Function to update user profile
+async function updateUserProfile(req, res) {
+    try {
+        const oldUser = await findUserById(req.session.userId);
+        const oldUsername = oldUser.username;
+        console.log("old user name is " + oldUsername);
+        const newUsername = req.body.username;
+        req.session.username = newUsername;
+        const newBio = req.body.bio;
+        const existingUser = await findUserByUsername(newUsername);
+        if (existingUser && existingUser.username != oldUsername) { // allows keeping old username
+            return res.redirect('/profile?error=Username+already+exists');
+        }
+
+        //await db.run('UPDATE users SET username = ?, avatar_url = ?, bio = ? WHERE id = ?', [newUsername, newAvatarUrl, newBio, req.session.userId]);
+        await db.run('UPDATE users SET username = ?, bio = ? WHERE id = ?', [newUsername, newBio, req.session.userId]);
+        await db.run('UPDATE posts SET username = ? WHERE username = ?', [newUsername, oldUsername]);
+        await db.run('UPDATE replies SET username = ? WHERE username = ?', [newUsername, oldUsername]);
+        res.redirect('/profile');
+    } catch (error) {
+        res.redirect('/error');
+    }
+}
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const uploadPath = path.join(__dirname, 'public', 'avatars');
+        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
+        }
+        cb(null, uploadPath);
+    },
+    filename: function (req, file, cb) {
+        const userId = req.session.userId;
+        const ext = path.extname(file.originalname);
+        cb(null, `${userId}${ext}`);
+    }
+});
+
+const upload = multer({ storage: storage });
+
+// Profile update route
+app.post('/profile', isAuthenticated, async (req, res) => {
+    updateUserProfile(req, res);
+});
+
+app.get('/sort-likes', async (req, res) => {
+    const posts = await getPostsSortedByLikes();
+    const user = await getCurrentUser(req) || {};
+    res.render('home', { posts, user, apikey: accessToken });
+});
+
+app.get('/auth/google',
+    passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+// Handle Google callback
+app.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/' }),
+    async (req, res) => {
+        const googleId = req.user.id;
+        const hashedGoogleId = hash(googleId);
+        req.session.hashedGoogleId = hashedGoogleId;
+
+        console.log(googleId);
+        console.log(hashedGoogleId);
+
+        // Check if user already exists
+        try {
+            let localUser = await findUserByHashedGoogleId(hashedGoogleId);
+            console.log('Local user found:', localUser);
+            if (localUser) {
+                req.session.userId = localUser.id;
+                req.session.loggedIn = true;
+                res.redirect('/');
+            } else {
+                res.redirect('/registerUsername');
+            }
+        }
+        catch (err) {
+            console.error('Error finding user:', er);
+            res.redirect('/error');
+        }
 });
 
 // Register GET route is used for error response from registration
 //
+app.get('/registerUsername', (req, res) => {
+    res.render('registerUsername', { regError: req.query.error });
+});
+
 app.get('/register', (req, res) => {
     res.render('loginRegister', { regError: req.query.error });
 });
@@ -121,67 +335,99 @@ app.get('/error', (req, res) => {
 
 // Additional routes that you must implement
 
+app.post('/posts',async (req, res) => {
+    //TODO: Add a new post and redirect to home
 
-app.get('/post/:id', (req, res) => {
-    // TODO: Render post detail page
-});
-app.post('/posts', (req, res) => {
-    // TODO: Add a new post and redirect to home
-    
     const title = req.body.title;
     const content = req.body.content;
-    const user = getCurrentUser(req);
-    addPost(title, content, user);
-    res.redirect('/');
+    const user = await getCurrentUser(req);
+
+    if (user) {
+        await addPost(title, content, user);
+        res.redirect('/');
+    } else {
+        res.redirect('/login');
+    }
+
 });
-app.post('/like/:id', (req, res) => {
+app.post('/like/:id', isAuthenticated, (req, res) => {
     // TODO: Update post likes
-    updatePostLikes();
+    updatePostLikes(req, res);
 });
-app.get('/profile', isAuthenticated, (req, res) => {
+app.get('/profile', isAuthenticated, async (req, res) => {
     // TODO: Render profile page
-    renderProfile(req, res);
+    const regError = req.query.error || '';
+    await renderProfile(req, res, regError);
 });
-app.get('/avatar/:username', (req, res) => {
+app.get('/avatar/:username',async (req, res) => {
     // TODO: Serve the avatar image for the user
-    console.log(`Generating avatar for username: ${req.params.username}`);
-    const username = req.params.username;
-    const letter = username.charAt(0).toUpperCase();
-    const avatar = generateAvatar(letter);
-    res.set('Content-Type', 'image/png');
-    res.send(avatar);
+    await handleAvatar(req,res);
+});
+app.post('/profile/avatar', isAuthenticated, upload.single('myImage'), async (req, res) => {
+    const userId = req.session.userId;
+    // const filePath = `/avatars/${req.file.filename}`;
+    const uploadPath = path.join(__dirname, 'public', 'avatars');
+    const inputFilePath = req.file.path; // Input file path
+    const outputFilePath = path.join(uploadPath, `${userId}.png`); // Output file path
+    
+    try {
+        await sharp(inputFilePath)
+            .rotate()
+            .resize({
+                fit: 'cover',
+                width: 100,
+                height: 100,
+            })
+            .toFile(outputFilePath); // Save the resized image to the output file
+
+        // Update the database with the new avatar URL
+        const filePath = `/avatars/${userId}.png`;
+        await db.run('UPDATE users SET avatar_url = ? WHERE id = ?', [filePath, userId]);
+        res.redirect('/profile');
+    } catch (error) {
+        console.error('Error updating avatar:', error);
+        res.redirect('/error');
+    }
+});
+app.post('/registerUsername', (req, res) => {
+    registerUsername(req, res);
 });
 app.post('/register', (req, res) => {
     registerUser(req, res);
 });
 app.post('/login', (req, res) => {
     // TODO: Login a user
-    loginUser(req, res); // login validation
-
-    req.session.regenerate((err) => {
-        if (err) {
-            return res.status(500)
-                        .send('Failed to regenerate session');
-        }
-        res.send('Logged in successfully');
-    })
+    loginUser(req, res);
 });
 app.get('/logout', (req, res) => {
     logoutUser(req, res);
 });
-app.post('/delete/:id', isAuthenticated, (req, res) => {
+app.get('/googleLogout', (req, res) => {
+    res.render('googleLogout');
+});
+app.post('/delete/:id', isAuthenticated, async (req, res) => {
     // TODO: Delete a post if the current user is the owner
-    const user = getCurrentUser(req) || {}; // get current user
+    const user = await getCurrentUser(req) || {}; // get current user
     const postId = parseInt(req.params.id); // get post id from url
-    const postToDelete = posts.findIndex(post => post.id === postId); // -1 if not found
+    
+    try {
+        const postToDelete = await db.get('SELECT * FROM posts WHERE id = ?', [postId]);
 
-    if (postToDelete !== -1) {
-        if (posts[postIndex].id === user.id) {
-            posts.splice(postIndex, 1);
-            res.send('Post successfully deleted');
+        if (!postToDelete) { // if post doesn't exist
+            return res.status(404).send('Post not found');
         }
-    } else {
-        res.status(404).send('Post not found');
+
+        if (postToDelete.username !== user.username) { // safeguard against deleting others posts
+            return res.status(403).send('You are not allowed to delete other users\' posts');
+        }
+
+        await db.run('DELETE FROM replies WHERE repliedToId = ?', [postId]); // delete replies from database
+        await db.run('DELETE FROM posts WHERE id = ?', [postId]); // delete from database
+        
+        res.send('Post successfully deleted');
+    } catch (error) {
+        console.error('Error deleting post:', error);
+        res.status(500).send('Internal Server Error');
     }
 });
 
@@ -197,32 +443,34 @@ app.listen(PORT, () => {
 // Support Functions and Variables
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// Example data for posts and users
-let posts = [
-    { id: 1, title: 'Sample Post', content: 'This is a sample post.  sadfasdf', username: 'SampleUser', timestamp: '2024-01-01 10:00', likes: 0 },
-    { id: 2, title: 'Another Post', content: 'This is another sample post.', username: 'AnotherUser', timestamp: '2024-01-02 12:00', likes: 0 },
-];
-let users = [
-    { id: 1, username: 'SampleUser', avatar_url: '/avatar/SampleUser', memberSince: '2024-01-01 08:00' },
-    { id: 2, username: 'AnotherUser', avatar_url: '/avatar/AnotherUser', memberSince: '2024-01-02 09:00' },
-];
-
 // Function to find a user by username
-function findUserByUsername(username) {
+async function findUserByUsername(username) {
     // TODO: Return user object if found, otherwise return undefined
-    return users.find(user => user.username === username);
+    try {
+        const user = await db.get('SELECT * FROM users WHERE username = ?', [username]);
+        return user;
+    } catch (error) {
+        console.error('Error finding user by username:', error);
+        throw error; // throws error to caller 
+    }
 }
 
 // Function to find a user by user ID
-function findUserById(userId) {
+async function findUserById(userId) {
     // TODO: Return user object if found, otherwise return undefined
-    return users.find(user => user.id === userId);
+    try {
+        const user = await db.get('SELECT * FROM users WHERE id = ?', [userId]);
+        return user;
+    } catch (error) {
+        console.error('Error finding user by ID:', error);
+        throw error; // throws error to caller 
+    }
 }
 
 // Function to add a new user
-function addUser(username) {
+async function addUser(username, req) {
     // TODO: Create a new user object and add to users array
-    const idNum = users.length > 0 ? users[users.length - 1].id + 1 : 1;
+    const googleId = req.session.hashedGoogleId;
     const currentDate = new Date();
     const year = currentDate.getFullYear();
     const month = String(currentDate.getMonth() + 1).padStart(2, '0');
@@ -231,16 +479,15 @@ function addUser(username) {
     const minutes = String(currentDate.getMinutes()).padStart(2, '0');
     const memberDate = year + '-' + month + '-' + day + ' ' + hours + ':' + minutes;
 
-    let newUser = {
-        id: idNum,
-        username: username,
-        avatar_url: `/avatar/${username}`,
-        memberSince: memberDate
-    };
-    users.push(newUser);
-
-    console.log(newUser);
-    console.log(users);
+    try {
+        await db.run(
+            'INSERT INTO users (username, hashedGoogleId, memberSince) VALUES (?, ?, ?)',
+            [username, googleId, memberDate]
+        );
+    } catch (error) {
+        console.error('Error adding user to database:', error);
+        throw error; // throws error to caller
+    }
 }
 
 // Middleware to check if user is authenticated
@@ -253,34 +500,24 @@ function isAuthenticated(req, res, next) {
     }
 }
 
-// Function to register a user
-function registerUser(req, res) {
+// SQL DATABASE REGISTER CREATING A USERNAME AFTER LOGGING IN GMAIL
+async function registerUsername(req, res) {
     // TODO: Register a new user and redirect appropriately
     const username = req.body.username;
     console.log("Attempting to register:", username);
-    if (findUserByUsername(username)) {
-        // Username already exists
-        res.redirect('/register?error=Username+already+exists');
-    } else {
-        addUser(username);
-        res.redirect('/login');
-    }
-}
-
-// Function to login a user
-function loginUser(req, res) {
-    // TODO: Login a user and redirect appropriately
-    const username = req.body.username;
-    const user = findUserByUsername(username);
-    console.log("Attempting to login:", username);
+    let user = await findUserByUsername(username);
     if (user) {
-        // Successful login
-        req.session.userId = user.id;
-        req.session.loggedIn = true;
-        res.redirect('/'); // redirect to home page upon login
+        res.redirect('/registerUsername?error=Username+already+exists');
     } else {
-        // Invalid username
-        res.redirect('/login?error=Invalid+username');
+        try {
+            await addUser(username, req);
+            const newUser = await findUserByUsername(username);
+            req.session.userId = newUser.id;
+            req.session.loggedIn = true;
+            res.redirect('/');
+        } catch (error) {
+            res.redirect('/error');
+        }
     }
 }
 
@@ -290,116 +527,185 @@ function logoutUser(req, res) {
     req.session.destroy(err => {
         if (err) {
             console.error('Error destroying session:', err);
-            res.redirect('/error'); // Redirect to an error page
+            res.redirect('/error'); // redirect to error page
         } else {
             res.clearCookie('sessionId');
-            res.redirect('/'); // Redirect to the home page after successful logout
+            res.redirect('/googleLogout'); // redirect to home page
         }
     });
 }
 
 // Function to render the profile page
-function renderProfile(req, res) {
+async function renderProfile(req, res, regError) {
     // TODO: Fetch user posts and render the profile page
-    const currentUser = getCurrentUser(req); // fetch user based on req
-    if (currentUser) {
-        
+    const currUser = await getCurrentUser(req); // fetch user based on req
+    if (currUser) {
+        let userPosts = await db.all('SELECT * FROM posts WHERE username = ?', [currUser.username]);
+        let userPostsWithReplies = await Promise.all(userPosts.map(async (post) => {
+            const replies = await db.all('SELECT * FROM replies WHERE repliedToId = ?', post.id);
+            return { ...post, replies };
+        }));
+        userPostsWithReplies = userPostsWithReplies.slice().reverse();
+        res.render('profile', { posts: userPostsWithReplies, user: currUser, regError });
     } else {
         res.redirect('/login');
     }
 }
 
 // Function to update post likes
-function updatePostLikes(req, res) {
+async function updatePostLikes(req, res) {
     // TODO: Increment post likes if conditions are met
     const postId = parseInt(req.params.id);
-    const user = getCurrentUser(req);
-    const post = posts.find(post => post.id === postId);
-    if (post) { 
-        if (post.username !== user.username) {
-            // If the current user is not the owner, increment likes
-            post.likes++;
-            return res.send('Post successfully liked');
+    const user = await getCurrentUser(req);
+    try {
+        const post = await db.get('SELECT * FROM posts WHERE id = ?', [postId]);
+
+        if (post) {
+            const likedByUsers = post.likedBy ? JSON.parse(post.likedBy) : [];
+
+            if (likedByUsers.includes(user.id)) {
+                // User already liked the post, so unlike it
+                likedByUsers.splice(likedByUsers.indexOf(user.id), 1);
+                post.likes--;
+
+                await db.run('UPDATE posts SET likes = ?, likedBy = ? WHERE id = ?', [post.likes, JSON.stringify(likedByUsers), post.id]);
+                return res.status(200).json({ likes: post.likes, liked: false });
+            } else {
+                // User hasn't liked the post, so like it
+                likedByUsers.push(user.id);
+                post.likes++;
+
+                await db.run('UPDATE posts SET likes = ?, likedBy = ? WHERE id = ?', [post.likes, JSON.stringify(likedByUsers), post.id]);
+                return res.status(200).json({ likes: post.likes, liked: true });
+            }
+        } else {
+            return res.status(404).send('Post not found');
         }
-    } else {
-        // If the post does not exist, send a not found response
-        return res.status(404).send('Post not found');
+    } catch (error) {
+        console.error('Error updating post likes:', error);
+        return res.status(500).send('Internal Server Error');
     }
 }
 
 // Function to handle avatar generation and serving
-function handleAvatar(req, res) {
+async function handleAvatar(req, res) {
     // TODO: Generate and serve the user's avatar image
     const username = req.params.username;
-    const letter = username.charAt(0).toUpperCase();
-    const avatar = generateAvatar(letter);
-    res.set('Content-Type', 'image/png');
-    res.send(avatar);
-}
+    try {
+        const user = await findUserByUsername(username);
 
-// Function to get the current user from session
-function getCurrentUser(req) {
-    // TODO: Return the user object if the session user ID matches
-    const userId = req.session.userId;
-    if (userId) {
-        return users.find(user => user.id === userId);
+        if (user) {
+            if (user.avatar_url && !user.avatar_url.endsWith(user.username)) {
+                // Serve the custom avatar if it exists
+                const avatarPath = path.join(__dirname, 'public', user.avatar_url);
+                return res.sendFile(avatarPath);
+            } else {
+                // Generate and serve the default avatar
+                const letter = username.charAt(0).toUpperCase();
+                const avatar = generateAvatar(letter);
+                res.set('Content-Type', 'image/png');
+                return res.send(avatar);
+            }
+        } else {
+            return res.status(404).send('User not found');
+        }
+    } catch (error) {
+        console.error('Error handling avatar:', error);
+        return res.status(500).send('Internal Server Error');
     }
 }
 
-// Function to get all posts, sorted by latest first
-function getPosts() {
-    return posts.slice().reverse();
+// Function to get the current user from session
+async function getCurrentUser(req) {
+    const userId = req.session.userId;
+    if (userId) {
+        const user = await findUserById(userId);
+        return user;
+    }
+    return null;
+}
+
+// Function to get all posts, sorted by most recent first
+async function getPosts() {
+    // const posts = await db.all('SELECT * FROM posts');
+    // return posts.slice().sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    try {
+        const posts = await db.all('SELECT * FROM posts');
+
+        const postsWithReplies = await Promise.all(posts.map(async (post) => {
+            const replies = await db.all('SELECT * FROM replies WHERE repliedToId = ?', post.id);
+            return { ...post, replies };
+        }));
+        
+        return postsWithReplies.slice().sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        return [];
+    }
+}
+
+async function getPostsSortedByLikes() {
+    // const posts = await db.all('SELECT * FROM posts');
+    const posts = await db.all('SELECT * FROM posts');
+
+    const postsWithReplies = await Promise.all(posts.map(async (post) => {
+        const replies = await db.all('SELECT * FROM replies WHERE repliedToId = ?', post.id);
+        return { ...post, replies };
+    }));
+    return postsWithReplies.slice().sort((a, b) => b.likes - a.likes);
 }
 
 // Function to add a new post
-function addPost(title, content, user) {
+async function addPost(title, content, user) {    
     // TODO: Create a new post object and add to posts array
-    const postIdNum = posts.length > 0 ? posts[posts.length - 1].id + 1 : 1;
     const currentDate = new Date();
     const year = currentDate.getFullYear();
     const month = String(currentDate.getMonth() + 1).padStart(2, '0');
     const day = String(currentDate.getDate()).padStart(2, '0');
     const hours = String(currentDate.getHours()).padStart(2, '0');
     const minutes = String(currentDate.getMinutes()).padStart(2, '0');
-    const timestamp = year + '-' + month + '-' + day + ' ' + hours + ':' + minutes;
+    const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+    const timestamp = year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
 
-    let newPost = {
-        id: postIdNum,
-        title: title,
-        content: content,
-        username: user.username,
-        timestamp: timestamp,
-        likes: 0
+    try {
+        await db.run('INSERT INTO posts (title, content, username, timestamp, likes) VALUES (?, ?, ?, ?, ?)', [title, content, user.username, timestamp, 0]);
+        console.log('Post added to database.');
+    } catch (error) {
+        console.error('Error adding post to database:', error);
     }
-    posts.push(newPost);   
 }
-
 // Function to generate an image avatar
 function generateAvatar(letter, width = 100, height = 100) {
     // TODO: Generate an avatar image with a letter
-    // Steps:
-    // 1. Choose a color scheme based on the letter
-    // 2. Create a canvas with the specified width and height
-    // 3. Draw the background color
-    // 4. Draw the letter in the center
-    // 5. Return the avatar as a PNG buffer
+    
+    const { createCanvas } = require('canvas');
     const canvas = createCanvas(width, height);
     const ctx = canvas.getContext('2d');
 
-    // Choose a background color based on the letter (you can customize this)
     const colors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#FF9933'];
     const color = colors[letter.charCodeAt(0) % colors.length];
     
-    // Draw background
     ctx.fillStyle = color;
     ctx.fillRect(0, 0, width, height);
 
-    // Draw letter
-    ctx.fillStyle = '#FFFFFF'; // White text color
+    ctx.fillStyle = '#FFFFFF';
     ctx.font = `${width * 0.6}px sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(letter.toUpperCase(), width / 2, height / 2);
 
     return canvas.toBuffer('image/png');
+}
+
+function hash(input) {
+    return crypto.createHash('sha256').update(input).digest('hex');
+}
+
+async function findUserByHashedGoogleId(hashedGoogleId) {
+    try {
+        const currUser = await db.get('SELECT * FROM users WHERE hashedGoogleId = ?', [hashedGoogleId]);
+        return currUser; // undefined if no user is found
+    } catch (err) {
+        throw err;
+    }
 }
