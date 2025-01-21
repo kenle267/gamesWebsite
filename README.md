@@ -1,6 +1,7 @@
 # gamesWebsite
 
-A simple game website that implements 4 casino-themed games, BlackJack, Slots, Roulette, and Coin Flip!
+A simple game website that implements 4 casino-themed games, BlackJack, Slots, Roulette, and Coin Flip! Contributed to by Ryan Marr and Kenny Le
+
 ![image (2)](https://github.com/user-attachments/assets/64335758-d89c-445b-b5a5-18ed82958fe9)
 ![image](https://github.com/user-attachments/assets/79fd11fc-282f-4bc2-9ac8-80de5ad992d2)
 ![image](https://github.com/user-attachments/assets/e5f5610c-97af-49f7-9830-80ebd5e2b9dd)
